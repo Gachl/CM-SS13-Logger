@@ -135,8 +135,13 @@ namespace CM_SS13_Logger
             }
 
             // Scroll to the bottom, if necessary
-            if (this.dgvLogMessages.Rows.Count > 0 && scroll && message.Handled)
-                this.dgvLogMessages.FirstDisplayedScrollingRowIndex = this.dgvLogMessages.Rows[this.dgvLogMessages.Rows.Count - 1].Index;
+            try
+            {
+                if (this.dgvLogMessages.Rows.Count > 0 && scroll && message.Handled)
+                    this.dgvLogMessages.FirstDisplayedScrollingRowIndex = this.dgvLogMessages.Rows[this.dgvLogMessages.Rows.Count - 1].Index;
+            }
+            // TODO: figure out which tests need to be performed before calling FirstDisplayedScrollingRowIndex to stop exceptions
+            catch (Exception) { }
         }
 
         #region Editor
@@ -144,7 +149,7 @@ namespace CM_SS13_Logger
         {
             List<ColumnDefinition> editorResult = this.showEditor<ColumnDefinition>("Edit columns", this.columns);
             this.columns = editorResult ?? this.columns;
-            
+
             // Update only if OK was pressed
             if (editorResult != null)
                 this.updateColumns();
