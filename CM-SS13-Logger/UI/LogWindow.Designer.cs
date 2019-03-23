@@ -65,34 +65,41 @@
             this.editParseRulesToolStripMenuItem,
             this.editHighlightRulesToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(179, 92);
+            this.contextMenu.Size = new System.Drawing.Size(245, 92);
             // 
             // renameWindowToolStripMenuItem
             // 
             this.renameWindowToolStripMenuItem.Name = "renameWindowToolStripMenuItem";
-            this.renameWindowToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
-            this.renameWindowToolStripMenuItem.Text = "Rename window";
+            this.renameWindowToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.renameWindowToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
+            this.renameWindowToolStripMenuItem.Text = "&Rename window";
             this.renameWindowToolStripMenuItem.Click += new System.EventHandler(this.renameWindowToolStripMenuItem_Click);
             // 
             // editColumnsToolStripMenuItem
             // 
             this.editColumnsToolStripMenuItem.Name = "editColumnsToolStripMenuItem";
-            this.editColumnsToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
-            this.editColumnsToolStripMenuItem.Text = "Edit Columns";
+            this.editColumnsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.C)));
+            this.editColumnsToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
+            this.editColumnsToolStripMenuItem.Text = "Edit &Columns";
             this.editColumnsToolStripMenuItem.Click += new System.EventHandler(this.editColumnsToolStripMenuItem_Click);
             // 
             // editParseRulesToolStripMenuItem
             // 
             this.editParseRulesToolStripMenuItem.Name = "editParseRulesToolStripMenuItem";
-            this.editParseRulesToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
-            this.editParseRulesToolStripMenuItem.Text = "Edit Parse Rules";
+            this.editParseRulesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.P)));
+            this.editParseRulesToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
+            this.editParseRulesToolStripMenuItem.Text = "Edit &Parse Rules";
             this.editParseRulesToolStripMenuItem.Click += new System.EventHandler(this.editParseRulesToolStripMenuItem_Click);
             // 
             // editHighlightRulesToolStripMenuItem
             // 
             this.editHighlightRulesToolStripMenuItem.Name = "editHighlightRulesToolStripMenuItem";
-            this.editHighlightRulesToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
-            this.editHighlightRulesToolStripMenuItem.Text = "Edit Highlight Rules";
+            this.editHighlightRulesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.H)));
+            this.editHighlightRulesToolStripMenuItem.Size = new System.Drawing.Size(244, 22);
+            this.editHighlightRulesToolStripMenuItem.Text = "Edit &Highlight Rules";
             this.editHighlightRulesToolStripMenuItem.Click += new System.EventHandler(this.editHighlightRulesToolStripMenuItem_Click);
             // 
             // LogWindow

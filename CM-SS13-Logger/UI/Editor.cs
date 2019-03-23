@@ -33,5 +33,10 @@ namespace CM_SS13_Logger
         {
             this.Close();
         }
+
+        private void Editor_Shown(object sender, EventArgs e)
+        {
+            this.dgvEditor.AutoResizeColumns();
+        }
     }
 }

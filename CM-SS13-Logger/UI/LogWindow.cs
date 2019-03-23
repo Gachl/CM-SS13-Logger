@@ -142,8 +142,13 @@ namespace CM_SS13_Logger
         #region Editor
         private void editColumnsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.columns = this.showEditor<ColumnDefinition>("Edit columns", this.columns) ?? this.columns;
-            this.updateColumns();
+            List<ColumnDefinition> editorResult = this.showEditor<ColumnDefinition>("Edit columns", this.columns);
+            this.columns = editorResult ?? this.columns;
+            
+            // Update only if OK was pressed
+            if (editorResult != null)
+                this.updateColumns();
+
             this.Updated?.Invoke(this);
         }
 

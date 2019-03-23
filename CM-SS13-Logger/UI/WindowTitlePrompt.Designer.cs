@@ -39,8 +39,8 @@
             this.btnOK.Location = new System.Drawing.Point(178, 51);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
-            this.btnOK.TabIndex = 0;
-            this.btnOK.Text = "OK";
+            this.btnOK.TabIndex = 1;
+            this.btnOK.Text = "&OK";
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
@@ -50,8 +50,8 @@
             this.btnCancel.Location = new System.Drawing.Point(97, 51);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 1;
-            this.btnCancel.Text = "Cancel";
+            this.btnCancel.TabIndex = 2;
+            this.btnCancel.Text = "&Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
@@ -61,7 +61,7 @@
             this.lblWindowTitle.Location = new System.Drawing.Point(12, 9);
             this.lblWindowTitle.Name = "lblWindowTitle";
             this.lblWindowTitle.Size = new System.Drawing.Size(136, 13);
-            this.lblWindowTitle.TabIndex = 2;
+            this.lblWindowTitle.TabIndex = 0;
             this.lblWindowTitle.Text = "Please enter a window title:";
             // 
             // txtWindowTitle
@@ -71,7 +71,7 @@
             this.txtWindowTitle.Location = new System.Drawing.Point(12, 25);
             this.txtWindowTitle.Name = "txtWindowTitle";
             this.txtWindowTitle.Size = new System.Drawing.Size(241, 20);
-            this.txtWindowTitle.TabIndex = 3;
+            this.txtWindowTitle.TabIndex = 0;
             // 
             // WindowTitlePrompt
             // 

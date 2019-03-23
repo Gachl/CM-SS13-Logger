@@ -226,5 +226,11 @@ namespace CM_SS13_Logger
         {
             this.progressBar.Width = this.statusStrip.Width - this.lblCurrentStatus.Width - 32;
         }
+
+        private void stayTopmostWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.TopMost = !this.TopMost;
+            this.stayTopmostWindowToolStripMenuItem.Text = this.TopMost ? "Don't stay topmost window" : "Stay topmost window";
+        }
     }
 }
