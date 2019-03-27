@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -10,12 +12,19 @@ namespace CM_SS13_Logger
 {
     public partial class LogWindow : Form
     {
+        private static readonly int MAX_HISTORY = 20;
+
         // Rule sets for this log window
         private List<ParseRule> parseRules;
         private List<HighlightRule> highlightRules;
 
         public List<ParseRule> ParseRules => this.parseRules.ToList();
         public List<HighlightRule> HighlightRules => this.highlightRules.ToList();
+
+        private Queue<string> lineHistory;
+
+        // Font cache required for performance and GC reasons
+        private List<Font> fontCache = new List<Font>();
 
         // Columns
         private List<ColumnDefinition> columns;
@@ -66,6 +75,7 @@ namespace CM_SS13_Logger
             this.highlightRules = highlightRules?.ToList() ?? new List<HighlightRule>();
 
             // Setup message handling
+            this.lineHistory = new Queue<string>();
             logReader.LogMessage += onLogMessage;
 
             // Column initialisation
@@ -102,11 +112,16 @@ namespace CM_SS13_Logger
             // Check if we should be scrolling before adding a new row
             bool scroll = this.dgvLogMessages.Rows.Count == 0 || this.dgvLogMessages.Rows[this.dgvLogMessages.Rows.Count - 1].Displayed;
 
+            // Keep track of the history, limited for performance reasons
+            this.lineHistory.Enqueue(message.Text);
+            while (this.lineHistory.Count > MAX_HISTORY)
+                this.lineHistory.Dequeue();
+
             // Find a match
-            // TODO: this should only result in a single Rule/Match set, a log message shouldn't be able to create multiple lines.
             foreach (ParseRule rule in this.parseRules)
             {
-                Match match = Regex.Match(message.Text, rule.Expression, RegexOptions.IgnoreCase);
+                string text = rule.Multiline ? String.Join(Environment.NewLine, this.lineHistory) : message.Text;
+                Match match = Regex.Match(text, rule.Expression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
                 if (match.Success)
                 {
                     message.Handled = true;
@@ -114,22 +129,43 @@ namespace CM_SS13_Logger
                     // Build DGV row
                     DataGridViewRow row = this.dgvLogMessages.Rows[this.dgvLogMessages.Rows.Add()];
                     foreach (ColumnDefinition columnDefinition in this.columns)
-                        row.Cells[columnDefinition.ColumnName].Value = match.Groups[columnDefinition.ColumnName].Value;
+                        if (this.dgvLogMessages.Columns.Contains(columnDefinition.ColumnName) && match.Groups.Cast<Group>().ToList().Find(g => g.Name == columnDefinition.ColumnName) != null)
+                            row.Cells[columnDefinition.ColumnName].Value = match.Groups[columnDefinition.ColumnName].Value;
 
                     // Highlight row
-                    HighlightRule highlightRule = this.highlightRules.Find(r => Regex.IsMatch(message.Text, r.Expression));
-                    if (highlightRule != null)
-                        row.DefaultCellStyle = new DataGridViewCellStyle()
-                        {
-                            BackColor = Color.FromKnownColor(highlightRule.BackgroundColor),
-                            Font = new Font(Font,
-                                (highlightRule.Bold ? FontStyle.Bold : FontStyle.Regular)
-                                | (highlightRule.Italic ? FontStyle.Italic : FontStyle.Regular)
-                                | (highlightRule.Underline ? FontStyle.Underline : FontStyle.Regular)
-                            ),
-                            ForeColor = Color.FromKnownColor(highlightRule.ForegroundColor)
-                        };
+                    // TODO: performance gets horrible the more rows have a font applied, even with the font cache
+                    FontStyle style = (row.DefaultCellStyle.Font ?? this.dgvLogMessages.Font).Style;
+                    foreach (HighlightRule highlightRule in this.highlightRules.Where(r => Regex.IsMatch(text, r.Expression)))
+                    {
 
+                        if (highlightRule.ForegroundColor.HasValue)
+                            row.DefaultCellStyle.ForeColor = Color.FromKnownColor(highlightRule.ForegroundColor.Value);
+                        if (highlightRule.BackgroundColor.HasValue)
+                            row.DefaultCellStyle.BackColor = Color.FromKnownColor(highlightRule.BackgroundColor.Value);
+
+                        if (highlightRule.Bold != CheckState.Indeterminate)
+                            style = highlightRule.Bold == CheckState.Checked ? style | FontStyle.Bold : style & ~FontStyle.Bold;
+                        if (highlightRule.Italic != CheckState.Indeterminate)
+                            style = highlightRule.Italic == CheckState.Checked ? style | FontStyle.Italic : style & ~FontStyle.Italic;
+                        if (highlightRule.Underline != CheckState.Indeterminate)
+                            style = highlightRule.Underline == CheckState.Checked ? style | FontStyle.Underline : style & ~FontStyle.Underline;
+
+                        if (highlightRule.Stop)
+                            break;
+                    }
+
+                    // If no style has been applied, don't update the font
+                    if ((row.DefaultCellStyle.Font ?? this.dgvLogMessages.Font).Style == style)
+                        break;
+
+                    Font cachedFont = this.fontCache.Find(f => f.Style == style);
+                    if (cachedFont == null)
+                    {
+                        cachedFont = new Font(row.DefaultCellStyle.Font ?? this.dgvLogMessages.Font, style);
+                        this.fontCache.Add(cachedFont);
+                    }
+
+                    row.DefaultCellStyle.Font = cachedFont;
                     break;
                 }
             }
@@ -145,37 +181,65 @@ namespace CM_SS13_Logger
         }
 
         #region Editor
+        private Dictionary<string, Form> editors = new Dictionary<string, Form>();
+
         private void editColumnsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            List<ColumnDefinition> editorResult = this.showEditor<ColumnDefinition>("Edit columns", this.columns);
-            this.columns = editorResult ?? this.columns;
+            this.showEditor<ColumnDefinition>("Edit columns", this.columns, ed =>
+            {
+                List<ColumnDefinition> editorResult = ed.Data;
 
-            // Update only if OK was pressed
-            if (editorResult != null)
+                this.columns = editorResult ?? this.columns;
+
                 this.updateColumns();
 
-            this.Updated?.Invoke(this);
+                this.Updated?.Invoke(this);
+            });
         }
 
         private void editParseRulesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.parseRules = this.showEditor<ParseRule>("Edit parse rules", this.ParseRules) ?? this.ParseRules;
-            this.Updated?.Invoke(this);
+            this.showEditor<ParseRule>("Edit parse rules", this.ParseRules, ed =>
+            {
+                this.parseRules = ed.Data ?? this.ParseRules;
+                this.Updated?.Invoke(this);
+            });
         }
 
         private void editHighlightRulesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.highlightRules = this.showEditor<HighlightRule>("Edit highlighting rules", this.highlightRules) ?? this.highlightRules;
-            this.Updated?.Invoke(this);
+            this.showEditor<HighlightRule>("Edit highlighting rules", this.highlightRules, ed =>
+            {
+                this.highlightRules = ed.Data ?? this.highlightRules;
+                this.Updated?.Invoke(this);
+            });
         }
 
-        private List<T> showEditor<T>(string title, List<T> data)
+        private void showEditor<T>(string title, List<T> data, Action<Editor<T>> callback)
         {
+            // Prevent multiple instances of the same editor
+            if (this.editors.ContainsKey(title))
+            {
+                this.editors[title].Show();
+                this.editors[title].BringToFront();
+                return;
+            }
+
+            // Create and show editor
             Editor<T> editor = new Editor<T>(data);
             editor.Text = title;
-            if (editor.ShowDialog() != DialogResult.OK)
-                return null;
-            return editor.Data;
+            editor.TopMost = this.MdiParent.TopMost;
+            editor.Show();
+            editor.FormClosed += (s, e) =>
+            {
+                this.editors.Remove(title);
+
+                if (editor.DialogResult != DialogResult.OK)
+                    return;
+
+                callback(editor);
+            };
+            this.editors.Add(title, editor);
         }
         #endregion
 

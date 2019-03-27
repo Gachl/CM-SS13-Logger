@@ -38,8 +38,14 @@ Simply write a regular expressing matching the log line that you want to display
 
 Successive matching regular expressions will be ignored, the first matching expressing will be used to parse the line. It will not generate multiple entries per log line if multiple expressions would match.
 
+Matches spanning multiple lines is possible with the `Multiline` checkbox checked. The total log history length that is used by the match is hardcoded into `LogWindow.MAX_HISTORY` and defaults to 20 lines. This way you can match announcements or character status messages that span multiple lines.
+
 ### Highlight rules
-The same as with the `Parse rules`, the highlight rules use regular expressions. If the expression matches a line then the highlight rule will be applied to the whole row. Only the first matching rule will be applied.
+The same as with the `Parse rules`, the highlight rules use regular expressions. If the expression matches a line then the highlight rule will be applied to the whole row.
+
+The styles (Bold, Italic, Underline) can have three states, checked means it will be applied, unchecked means it will be removed and indeterminate means it's inherited.
+
+All rules will be applied in succession until a rule with `Stop at this rule` is matching.
 
 Valid color names can be found on the [KnownColors enum documentation page](https://docs.microsoft.com/en-us/dotnet/api/system.drawing.knowncolor).
 

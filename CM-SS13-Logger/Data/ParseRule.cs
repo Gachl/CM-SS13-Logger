@@ -6,5 +6,8 @@ namespace CM_SS13_Logger
     {
         [DisplayName("Regular Expression")]
         public string Expression { get; set; } = "^(?<Message>.*)$";
+
+        [DisplayName("Multiline")]
+        public bool Multiline { get; set; } = false;
     }
 }

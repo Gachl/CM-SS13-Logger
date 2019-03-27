@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace CM_SS13_Logger
 {
@@ -9,18 +10,21 @@ namespace CM_SS13_Logger
         public string Expression { get; set; }
 
         [DisplayName("Foreground Color")]
-        public KnownColor ForegroundColor { get; set; } = KnownColor.Black;
+        public KnownColor? ForegroundColor { get; set; } = KnownColor.Black;
 
         [DisplayName("Background Color")]
-        public KnownColor BackgroundColor { get; set; } = KnownColor.White;
+        public KnownColor? BackgroundColor { get; set; } = KnownColor.White;
 
         [DisplayName("Bold")]
-        public bool Bold { get; set; }
+        public CheckState Bold { get; set; }
 
         [DisplayName("Italic")]
-        public bool Italic { get; set; }
+        public CheckState Italic { get; set; }
 
         [DisplayName("Underline")]
-        public bool Underline { get; set; }
+        public CheckState Underline { get; set; }
+
+        [DisplayName("Stop at this rule")]
+        public bool Stop { get; set; }
     }
 }
