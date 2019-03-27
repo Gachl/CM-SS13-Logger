@@ -47,7 +47,7 @@ The styles (Bold, Italic, Underline) can have three states, checked means it wil
 
 All rules will be applied in succession until a rule with `Stop at this rule` is matching.
 
-Valid color names can be found on the [KnownColors enum documentation page](https://docs.microsoft.com/en-us/dotnet/api/system.drawing.knowncolor).
+Valid color names can be found on the [KnownColors enum documentation page](https://docs.microsoft.com/en-us/dotnet/api/system.drawing.knowncolor). The color can also be empty in which case it will be inherited.
 
 ## Contribution
 If you got any bugs, issues, ideas or questions please open a new [issue](https://github.com/Gachl/CM-SS13-Logger/issues) or pull request.
